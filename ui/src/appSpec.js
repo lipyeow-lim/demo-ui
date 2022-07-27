@@ -46,7 +46,8 @@ const app_spec = {
               label: "<b>Edges</b>",
               dataref: "q1",
               colspecs: [
-                { title: "Sub Type", field: "sub_type", defaultSort: "desc" },
+                { title: "Time Bkt", field: "time_bkt", defaultSort: "desc" },
+                { title: "Sub Type", field: "sub_type" },
                 { title: "Sub ID", field: "sub_id" },
                 { title: "Sub Name", field: "sub_name", },
                 { title: "Pred", field: "pred" },
@@ -94,18 +95,9 @@ const app_spec = {
       type: "query",
       id  : "q1",
       backend: "native",
-      endpoint: "r0",
-      query: "select * from dns where (?='' or query like ?) AND (?='' or qtype_name = ?) limit 40;",
-      args: [{from: "ti1"}, {from: "ti1"}, {from: "m1"}, {from: "m1"}]
-    },
-    {
-      type: "query",
-      id: "qPub",
-      backend: "urlfetch",
-      endpoint: "r0",
-      query: "https://lipyeow.github.io/info/data/pubs.json",
-      fetch_on_init: true,
-      args: [],
+      endpoint: "demofieldeng",
+      query: "select * from lipyeow_ctx.v_edges where sub_name = '{{node_filter}}' limit 4;",
+      args: [{from: "ti1", sub: "node_filter"}],
     },
   ],
 };

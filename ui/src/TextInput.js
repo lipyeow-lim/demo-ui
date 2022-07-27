@@ -5,8 +5,8 @@ import TextField from "@material-ui/core/TextField";
 import { useRecoilState } from "recoil";
 
 function TextInput(args) {
-  console.log(args.id + " - appState:");
-  console.log(appState);
+  //console.log(args.id + " - appState:");
+  //console.log(appState);
   const [objState, setObjState] = useRecoilState(appState[args.id]);
 
   const id = "TextField-" + args.id;

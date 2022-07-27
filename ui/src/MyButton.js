@@ -9,19 +9,24 @@ function MyButton(args) {
   const qid = objState.trigger;
   const [queryState, setQueryState] = useRecoilState(appState[qid]);
 
-  //console.log("MyButton queryState.args:");
-  //console.log(queryState.args);
+  //console.log("MyButton qid:" + qid);
+  //console.log("MyButton queryState:");
+  //console.log(queryState);
   // Extract the values for the endpoint query params
   const handleClick = useRecoilCallback(({ snapshot }) => async () => {
     console.log("handleClick(" + args.id + "): ");
-    const qargs = await Promise.all(
+    // Go grab the values from the input widgets needed by the args
+    const args_list = await Promise.all(
       queryState.args.map(async (a) => {
         const qarg = await snapshot.getPromise(appState[a.from]);
         //console.log(qarg);
-        return qarg.value;
+        const obj = {};
+        obj[a.sub]= qarg.value;
+        return obj;
       })
     );
-    //console.log(qargs);
+    const qargs = args_list.reduce((acc, obj) => { return {...acc, ...obj}; }, {})
+    console.log(qargs);
     switch (queryState.backend) {
       case "presto":
         runPrestoQuery(queryState, setQueryState);

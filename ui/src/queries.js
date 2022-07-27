@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { cloneDeep } from "lodash";
 
 const gqlClient = new ApolloClient({
-  uri: "http://127.0.0.1:4000/graphql",
+  uri: "http://localhost:8000/graphql",
   cache: new InMemoryCache(),
   fetchOptions: {
     mode: "no-cors",

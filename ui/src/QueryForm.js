@@ -6,7 +6,7 @@ function QueryForm(args) {
   return (
     <form className={classes.root} noValidate autoComplete="off">
       {args.widgets.map((spec) => (
-        <Widget key={"QueryForm-" + spec} wspec={spec} widgets={args.widget} />
+        <Widget key={"QueryForm-" + spec.id} wspec={spec} widgets={args.widget} />
       ))}
     </form>
   );
