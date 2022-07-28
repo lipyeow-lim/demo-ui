@@ -6,6 +6,7 @@ import { QueryForm } from "./QueryForm.js";
 import { TextInput } from "./TextInput.js";
 import { Menu } from "./Menu.js";
 import { MyButton } from "./MyButton.js";
+import { GraphVis } from "./GraphVis.js";
 //import { useStyles } from "./Styles.js";
 
 // Grid will use 12 units has maxwidth
@@ -99,6 +100,20 @@ function Widget(args) {
             }}
             dangerouslySetInnerHTML={{ __html: args.wspec.value }}
           />
+        </Grid>
+      );
+    case "graphvis":
+      return (
+        <Grid
+          item
+          xs="12"
+          sm={args.wspec.hasOwnProperty("width") ? args.wspec.width : 12}
+        >
+        <GraphVis
+          key={args.wspec.id}
+          id={args.wspec.id}
+          label={args.wspec.label}
+        />
         </Grid>
       );
     default:

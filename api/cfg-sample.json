@@ -1,0 +1,32 @@
+{
+    "endpoints": [ 
+        {   
+            "name": "demofieldeng",
+            "type": "databricks-sql",
+            "conn": { 
+            "server_hostname" : "e2-demo-field-eng.cloud.databricks.com",
+            "http_path" : "/sql/1.0/endpoints/679731b724da90f6",
+            "access_token": "changeme"
+            }
+        },
+        {   "name": "gcp",
+            "type": "databricks-sql",
+            "conn": 
+            {
+            "server_hostname": "416411475796958.8.gcp.databricks.com",
+            "http_path": "/sql/1.0/endpoints/2ceb10c2c27a74a4",
+            "access_token": "changeme"
+            }
+        },
+        {   
+            "name": "azure",
+            "type": "databricks-sql",
+            "conn": 
+            {
+            "server_hostname": "adb-5206439413157315.15.azuredatabricks.net",
+            "http_path": "/sql/1.0/endpoints/b891039e995229bc",
+            "access_token": "changeme"
+            }
+        }
+    ] 
+}

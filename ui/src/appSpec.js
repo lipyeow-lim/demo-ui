@@ -27,10 +27,12 @@ const app_spec = {
                 },
                 {
                 type: "menu",
-                label: "QType",
+                label: "Timeframe",
                 id: "m1",
-                values: [{id: 1, value:"A", display: "A"}, 
-                        {id: 2, value:"AAAA", display: "AAAA"}]
+                values: [
+                    {id: 1, value:"2022-07-20T00:00:00.000+0000", display: "2022-07-20"}, 
+                    {id: 2, value:"2022-07-21T00:00:00.000+0000", display: "2022-07-21"}, 
+                ]
                 },
                 {
                 type: "button",
@@ -69,6 +71,11 @@ const app_spec = {
                 headerStyle: { backgroundColor: "#FDEBD0"},
               },
             },
+            {
+              type: "graphvis",
+              id: "gVis01",
+              label: "<b>Graph</b>",
+            },
           ],
         },
         {
@@ -95,9 +102,100 @@ const app_spec = {
       type: "query",
       id  : "q1",
       backend: "native",
-      endpoint: "demofieldeng",
-      query: "select * from lipyeow_ctx.v_edges where sub_name = '{{node_filter}}' limit 4;",
-      args: [{from: "ti1", sub: "node_filter"}],
+      endpoint: "demo-field-eng",
+      query: `
+WITH sub_matches AS (
+  select
+    *
+  from
+    lipyeow_ctx.v_edges
+  where
+    time_bkt = '{{day_ts}}'
+    and ( sub_id = '{{node_filter}}'
+    or sub_name = '{{node_filter}}')
+), 
+sub_same_as AS (
+  SELECT
+    NULL as time_bkt,
+    s1.sub_type,
+    s1.sub_id,
+    s1.sub_name,
+    s1.pred,
+    s1.pred_status,
+    s1.obj_type,
+    s1.obj_id,
+    s1.obj_name,
+    NULL as first_seen,
+    NULL as last_seen,
+    NULL as cnt
+  FROM
+    sub_matches AS e1
+    JOIN lipyeow_ctx.same_as AS s1 ON e1.sub_id = s1.sub_id 
+),
+obj_matches AS (
+  select
+    *
+  from
+    lipyeow_ctx.v_edges
+  where
+    time_bkt = '{{day_ts}}'
+    and (obj_id = '{{node_filter}}'
+    or obj_name = '{{node_filter}}')
+),
+obj_same_as AS (
+  SELECT
+    NULL as time_bkt,
+    s3.sub_type,
+    s3.sub_id,
+    s3.sub_name,
+    s3.pred,
+    s3.pred_status,
+    s3.obj_type,
+    s3.obj_id,
+    s3.obj_name,
+    NULL as first_seen,
+    NULL as last_seen,
+    NULL as cnt
+  FROM
+    obj_matches AS e3
+    JOIN lipyeow_ctx.same_as AS s3 ON e3.obj_id = s3.sub_id
+)
+SELECT
+  *
+FROM
+  sub_matches
+UNION
+SELECT
+  e2.*
+FROM
+  sub_same_as AS s2
+  JOIN lipyeow_ctx.v_edges AS e2 ON s2.obj_id = e2.sub_id
+            and e2.time_bkt = '{{day_ts}}'
+UNION
+SELECT
+  *
+FROM
+  obj_matches
+UNION
+SELECT
+  e4.*
+FROM
+  obj_same_as AS s4
+  JOIN lipyeow_ctx.v_edges AS e4 ON s4.obj_id = e4.obj_id
+            and e4.time_bkt = '{{day_ts}}'
+UNION
+SELECT
+  *
+FROM
+  sub_same_as
+UNION
+SELECT
+  *
+FROM
+  obj_same_as
+LIMIT 100
+`,
+      args: [{from: "ti1", sub: "node_filter"}, {from: "m1", sub: "day_ts"}],
     },
   ],
 };
