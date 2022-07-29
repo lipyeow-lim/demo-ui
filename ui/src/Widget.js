@@ -103,10 +103,9 @@ function Widget(args) {
         </Grid>
       );
     case "graphvis":
-      let containerStyle = { width: "800px", height: "500px" };
       return (
         <Grid item xs="12">
-          <div style={containerStyle}>
+          <div style={args.wspec.style}>
             <GraphVis
               key={args.wspec.id}
               id={args.wspec.id}

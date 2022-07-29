@@ -14,7 +14,7 @@ import 'vis-network/styles/vis-network.css';
 function GraphVis(args) {
   const [objState, setObjState] = useRecoilState(appState[args.id]);
   const queryState = useRecoilValue(appState[objState.dataref]);
-  const version = useMemo(uuidv4, [queryState.graph,]);
+  const version = useMemo(uuidv4, [queryState.graph]);
   // TODO: sanity check on queryState.cols
   const graph = {
     nodes: [

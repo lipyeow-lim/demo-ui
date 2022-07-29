@@ -123,7 +123,12 @@ function runNativeQuery(client, qargs, queryState, setQueryState) {
   client.query({ query: data_query, variables: vars }).then((result) => {
     //console.log(result);
     let copyState = cloneDeep(queryState);
-    copyState.data = JSON.parse(result.data.getData.data);
+    if (copyState.cumulative) {
+      const rec_list = JSON.parse(result.data.getData.data);
+      copyState.data.push(...rec_list);
+    } else {
+      copyState.data = JSON.parse(result.data.getData.data);
+    }
     copyState.cols = JSON.parse(result.data.getData.colstr);
     //console.log(copyState);
     setQueryState(copyState);

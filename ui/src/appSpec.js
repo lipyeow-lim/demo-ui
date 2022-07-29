@@ -1,3 +1,91 @@
+import { v4 as uuidv4 } from 'uuid';
+
+function node_color(node_type) {
+  let color = "lightblue";
+  switch (node_type) {
+    case "user-aad":
+    case "user-okta":
+      color = "dimgray";
+      break;
+    case "ipAddress":
+      color = "orange";
+      break;
+    case "app":
+      color = "dodgerblue";
+      break;
+    default:
+      break;
+  }
+  return color;
+}
+// for derived states/selector that extract graphs
+// Note that the GraphVis library does not tolerate duplicates
+// in the ids of the nodes and there are cases where the same 
+// sub_id has two different sub_types in the data
+/* ASSUMPTION: the data is an array of json recs { 
+  time_bkt, 
+  sub_type,
+  sub_id,
+  sub_name,
+  pred,
+  pred_status,
+  obj_type,
+  obj_id,
+  obj_name,
+  first_seen,
+  last_seen,
+  cnt
+}
+*/ 
+function extract_graph_remap(data) {
+  let graph = { nodes: [], edges: [] };
+  if (data.length === 0) {
+    return graph;
+  }
+  let node_mapping = {};
+  let node_counter = 0;
+  const empty_g = { nodes: new Set(), edges: new Set() };
+  const tmp_g = data.reduce((g, x) => {
+    const sub_key = x.sub_type+":"+x.sub_id+":"+x.sub_name;
+    if (!node_mapping.hasOwnProperty(sub_key)) {
+      node_mapping[sub_key] = node_counter;
+      node_counter = node_counter + 1;
+    };
+    const obj_key = x.obj_type+":"+x.obj_id+":"+x.obj_name;
+    if (!node_mapping.hasOwnProperty(obj_key)) {
+      node_mapping[obj_key] = node_counter;
+      node_counter = node_counter + 1;
+    };
+    const n1 = {
+      id: node_mapping[sub_key],
+      label: "", title: x.sub_type + ":" + x.sub_name,
+      color: node_color(x.sub_type),
+      src_id: x.sub_id
+    };
+    const n2 = {
+      id: node_mapping[obj_key], 
+      label: "", title: x.obj_type + ":" + x.obj_name, 
+      color: node_color(x.obj_type),
+      src_id: x.obj_id
+    };
+    const e = { from: node_mapping[sub_key], to: node_mapping[obj_key], title: x.pred + ":" + x.pred_status };
+    g.nodes.add(JSON.stringify(n1));
+    g.nodes.add(JSON.stringify(n2));
+    g.edges.add(JSON.stringify(e));
+    return g;
+  }, empty_g);
+  graph.nodes = Array.from(tmp_g.nodes).map((n_str, idx) => {
+    let n = JSON.parse(n_str);
+    return n;
+  });
+  graph.edges = Array.from(tmp_g.edges).map((e_str, idx) => {
+    let e = JSON.parse(e_str);
+    e["id"] = idx;
+    return e;
+  });
+  return graph;
+};
+
 // text:
 //  - widths are in grid xs units
 //  - justify is passed to grid container justifyContent prop
@@ -36,11 +124,21 @@ const app_spec = {
                 },
                 {
                   type: "button",
-                  label: "Get edges",
+                  label: "Add edges",
                   id: "b1",
                   trigger: "q1"
                 },
+                
               ],
+            },
+            {
+              type: "text",
+              id: "txt_refresh_tip",
+              width: 12,
+              justify: "flex-start",
+              value: `<p>
+              <i>Use browser refresh to reset the graph.</i>
+              </p>`,
             },
             {
               type: "table",
@@ -76,8 +174,10 @@ const app_spec = {
               id: "gv01",
               dataref: "d1q1",
               label: "<b>Graph</b>",
+              style: { width: "800px", height: "500px" },
               options: {
                 layout: {
+                  improvedLayout: true,
                   hierarchical: false
                 },
                 edges: {
@@ -113,6 +213,7 @@ const app_spec = {
       id: "q1",
       backend: "native",
       endpoint: "demo-field-eng",
+      cumulative: true,
       query: `
 WITH sub_matches AS (
   select
@@ -211,7 +312,7 @@ LIMIT 100
       type: "derived",
       id: "d1q1",
       from: "q1",
-      derivation: "extract_graph"
+      derivation: extract_graph_remap
     }
   ],
 };
