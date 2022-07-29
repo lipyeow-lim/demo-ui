@@ -1,5 +1,6 @@
 import { app_spec } from "./appSpec";
 import { atom, selector } from "recoil";
+import { colors } from "@material-ui/core";
 
 function accumulateStateEntry(state, wspec) {
   switch (wspec.type) {
@@ -60,6 +61,26 @@ function genStateStruct(cur_state, widgets) {
   const stateStruct = widgets.reduce(accumulateStateEntry, cur_state);
   return stateStruct;
 }
+
+function node_color(node_type) {
+  let color = "lightblue";
+  switch (node_type) {
+    case "user-aad":
+    case "user-okta":
+      color = "dimgray";
+      break;
+    case "ipAddress":
+      color = "orange";
+      break;
+    case "app":
+      color = "dodgerblue";
+      break;
+    default:
+      break;
+  }
+  return color;
+}
+
 // for derived states/selector that extract graphs
 function extract_graph(data) {
   let graph = { nodes: [], edges: [] };
@@ -70,16 +91,26 @@ function extract_graph(data) {
   let node_counter = 0;
   const empty_g = { nodes: new Set(), edges: new Set() };
   const tmp_g = data.reduce((g, x) => {
-    if(! node_mapping.hasOwnProperty(x.sub_id)){
+    if (!node_mapping.hasOwnProperty(x.sub_id)) {
       node_mapping[x.sub_id] = node_counter;
       node_counter = node_counter + 1;
     };
-    if(! node_mapping.hasOwnProperty(x.obj_id)){
+    if (!node_mapping.hasOwnProperty(x.obj_id)) {
       node_mapping[x.obj_id] = node_counter;
       node_counter = node_counter + 1;
     };
-    const n1 = { id: node_mapping[x.sub_id], label: "", title: x.sub_type + ":" + x.sub_name, src_id: x.sub_id };
-    const n2 = { id: node_mapping[x.obj_id], label: "", title: x.obj_type + ":" + x.obj_name, src_id: x.obj_id };
+    const n1 = {
+      id: node_mapping[x.sub_id],
+      label: "", title: x.sub_type + ":" + x.sub_name,
+      color: node_color(x.sub_type),
+      src_id: x.sub_id
+    };
+    const n2 = {
+      id: node_mapping[x.obj_id], 
+      label: "", title: x.obj_type + ":" + x.obj_name, 
+      color: node_color(x.obj_type),
+      src_id: x.obj_id
+    };
     const e = { from: node_mapping[x.sub_id], to: node_mapping[x.obj_id], title: x.pred + ":" + x.pred_status };
     g.nodes.add(JSON.stringify(n1));
     g.nodes.add(JSON.stringify(n2));
@@ -121,7 +152,7 @@ function genAppState(widgets) {
           const g = extract_graph(src_state.data);
           return { graph: g };
         } else {
-          return { graph: {}};
+          return { graph: {} };
         }
       }
     }

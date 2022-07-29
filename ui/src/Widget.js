@@ -103,7 +103,7 @@ function Widget(args) {
         </Grid>
       );
     case "graphvis":
-      let containerStyle = { width: "500px", height: "500px" };
+      let containerStyle = { width: "800px", height: "500px" };
       return (
         <Grid item xs="12">
           <div style={containerStyle}>
