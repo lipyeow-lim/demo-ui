@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## How to add a new widget/component
+
+Suppose you want to add the button component.
+
+* Create the component in MyButton.js
+* Add the MyButton component to the switch statement in Widget.js that handles the code generation for rendering
+* Add the state (Recoil Atom) to state.js
+* Any custom logic & interactions
+
 ## Available Scripts
 
 In the project directory, you can run:

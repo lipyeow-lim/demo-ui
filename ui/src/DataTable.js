@@ -74,6 +74,7 @@ function DataTable(args) {
   };
 */
   // initialize the data that depends on initial fetch query
+  // TODO: this init doesn't belong here. Need to do it the recoil way
   React.useEffect(() => {
     if (queryState.backend === "urlfetch" && queryState.fetch_on_init) {
       //console.log("Run Url Fetch Query: " + objState.dataref);

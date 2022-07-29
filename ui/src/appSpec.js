@@ -7,9 +7,9 @@ const app_spec = {
       type: "tabcontainer",
       id: "tabcontainer01",
       style: {
-            backgroundColor: "#FCF3CF",
-            indicatorColor: "#DC7633",
-        },
+        backgroundColor: "#FCF3CF",
+        indicatorColor: "#DC7633",
+      },
       tabs: [
         {
           label: " Context Graph Analytics",
@@ -18,27 +18,27 @@ const app_spec = {
           widgets: [
             {
               type: "form",
-              id  : "f1",
+              id: "f1",
               widgets: [
                 {
-                type: "text_input",
-                label: "Enter node id or name",
-                id: "ti1"
+                  type: "text_input",
+                  label: "Enter node id or name",
+                  id: "ti1"
                 },
                 {
-                type: "menu",
-                label: "Timeframe",
-                id: "m1",
-                values: [
-                    {id: 1, value:"2022-07-20T00:00:00.000+0000", display: "2022-07-20"}, 
-                    {id: 2, value:"2022-07-21T00:00:00.000+0000", display: "2022-07-21"}, 
-                ]
+                  type: "menu",
+                  label: "Timeframe",
+                  id: "m1",
+                  values: [
+                    { id: 1, value: "2022-07-20T00:00:00.000+0000", display: "2022-07-20" },
+                    { id: 2, value: "2022-07-21T00:00:00.000+0000", display: "2022-07-21" },
+                  ]
                 },
                 {
-                type: "button",
-                label: "Get edges",
-                id: "b1",
-                trigger: "q1"
+                  type: "button",
+                  label: "Get edges",
+                  id: "b1",
+                  trigger: "q1"
                 },
               ],
             },
@@ -68,13 +68,23 @@ const app_spec = {
                 exportButton: true,
                 maxBodyHeight: "70vh",
                 padding: "dense",
-                headerStyle: { backgroundColor: "#FDEBD0"},
+                headerStyle: { backgroundColor: "#FDEBD0" },
               },
             },
             {
               type: "graphvis",
-              id: "gVis01",
+              id: "gv01",
+              dataref: "d1q1",
               label: "<b>Graph</b>",
+              options: {
+                layout: {
+                  hierarchical: false
+                },
+                edges: {
+                  color: "#000000"
+                },
+                height: "500px"
+              },
             },
           ],
         },
@@ -98,9 +108,9 @@ const app_spec = {
         },
       ],
     },
-    {    
+    {
       type: "query",
-      id  : "q1",
+      id: "q1",
       backend: "native",
       endpoint: "demo-field-eng",
       query: `
@@ -195,8 +205,14 @@ FROM
   obj_same_as
 LIMIT 100
 `,
-      args: [{from: "ti1", sub: "node_filter"}, {from: "m1", sub: "day_ts"}],
+      args: [{ from: "ti1", sub: "node_filter" }, { from: "m1", sub: "day_ts" }],
     },
+    {
+      type: "derived",
+      id: "d1q1",
+      from: "q1",
+      derivation: "extract_graph"
+    }
   ],
 };
 

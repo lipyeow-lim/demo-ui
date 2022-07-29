@@ -67,8 +67,8 @@ function Widget(args) {
     case "image":
       return (
         <Grid item xs="12"
-            sm={args.wspec.width} 
-          >
+          sm={args.wspec.width}
+        >
           <center>
             <img
               alt="portrait"
@@ -103,17 +103,17 @@ function Widget(args) {
         </Grid>
       );
     case "graphvis":
+      let containerStyle = { width: "500px", height: "500px" };
       return (
-        <Grid
-          item
-          xs="12"
-          sm={args.wspec.hasOwnProperty("width") ? args.wspec.width : 12}
-        >
-        <GraphVis
-          key={args.wspec.id}
-          id={args.wspec.id}
-          label={args.wspec.label}
-        />
+        <Grid item xs="12">
+          <div style={containerStyle}>
+            <GraphVis
+              key={args.wspec.id}
+              id={args.wspec.id}
+              label={args.wspec.label}
+              options={args.wspec.options}
+            />
+          </div>
         </Grid>
       );
     default:
