@@ -15,6 +15,7 @@ function TextInput(args) {
       key={id}
       id={id}
       label={args.label}
+      value={objState.value}
       onChange={(event) => {
         let copyState = cloneDeep(objState);
         copyState.value = event.target.value;

@@ -95,8 +95,8 @@ const app_spec = {
       type: "tabcontainer",
       id: "tabcontainer01",
       style: {
-        backgroundColor: "#FCF3CF",
-        indicatorColor: "#DC7633",
+        backgroundColor: "LightSkyBlue",
+        indicatorColor: "#098bdc",
       },
       tabs: [
         {
@@ -166,7 +166,7 @@ const app_spec = {
                 exportButton: true,
                 maxBodyHeight: "70vh",
                 padding: "dense",
-                headerStyle: { backgroundColor: "#FDEBD0" },
+                headerStyle: { backgroundColor: "#ceebfd" },
               },
             },
             {

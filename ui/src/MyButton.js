@@ -48,6 +48,7 @@ function MyButton(args) {
       id={args.id + "-Button"}
       trigger={args.trigger}
       variant="contained"
+      color="BlueGray"
       onClick={handleClick}
     >
       {args.label}
