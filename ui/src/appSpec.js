@@ -92,6 +92,16 @@ function extract_graph_remap(data) {
 const app_spec = {
   widgets: [
     {
+      type: "text",
+      id: "txt_banner",
+      width: 12,
+      justify: "flex-start",
+      value: `
+      <img src="databricks_logo.jpeg"
+            style="height:50px;"/>
+      `,
+    },
+    {
       type: "tabcontainer",
       id: "tabcontainer01",
       style: {
