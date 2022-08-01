@@ -91,19 +91,19 @@ function extract_graph_remap(data) {
 //  - justify is passed to grid container justifyContent prop
 const app_spec = {
   widgets: [
-    {
+    /*{
       type: "text",
       id: "txt_banner",
       width: 12,
       justify: "flex-start",
       value: `
-      <div>
+      <div style="height:30px;">
       <h2>
       <img src="https://github.com/lipyeow-lim/demo-ui/raw/main/ui/public/databricks_logo.jpeg"
-            style="height:70px;"/> Solution Accelerator Demo UI 
+            style="height:30px;"/> Solution Accelerator Demo UI 
       </h2>
       </div>`,
-    },
+    },*/
     {
       type: "tabcontainer",
       id: "tabcontainer01",
