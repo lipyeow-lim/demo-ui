@@ -97,9 +97,12 @@ const app_spec = {
       width: 12,
       justify: "flex-start",
       value: `
-      <img src="databricks_logo.jpeg"
-            style="height:50px;"/>
-      `,
+      <div>
+      <h2>
+      <img src="https://github.com/lipyeow-lim/demo-ui/raw/main/ui/public/databricks_logo.jpeg"
+            style="height:70px;"/> Solution Accelerator Demo UI 
+      </h2>
+      </div>`,
     },
     {
       type: "tabcontainer",
