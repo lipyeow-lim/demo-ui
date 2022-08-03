@@ -91,25 +91,30 @@ function extract_graph_remap(data) {
 //  - justify is passed to grid container justifyContent prop
 const app_spec = {
   widgets: [
-    /*{
+    {
       type: "text",
       id: "txt_banner",
       width: 12,
       justify: "flex-start",
       value: `
-      <div style="height:30px;">
-      <h2>
+      <div style="height: 10px;"><h2> &nbsp
       <img src="https://github.com/lipyeow-lim/demo-ui/raw/main/ui/public/databricks_logo.jpeg"
-            style="height:30px;"/> Solution Accelerator Demo UI 
-      </h2>
-      </div>`,
-    },*/
+            style="height:20px;"/> &nbsp Databricks Solution Accelerator Demo UI 
+      </h2></div>`,
+    },
     {
       type: "tabcontainer",
       id: "tabcontainer01",
       style: {
-        backgroundColor: "LightSkyBlue",
-        indicatorColor: "#098bdc",
+        // slate gray
+        backgroundColor: "#afcfcf",
+        indicatorColor: "DarkSlateGray",
+        // orange
+        //backgroundColor: "#ffd4cc",
+        //indicatorColor: "#ff6347",
+        // blue
+        //backgroundColor: "LightSkyBlue",
+        //indicatorColor: "#098bdc",
       },
       tabs: [
         {
@@ -145,49 +150,11 @@ const app_spec = {
               ],
             },
             {
-              type: "text",
-              id: "txt_refresh_tip",
-              width: 12,
-              justify: "flex-start",
-              value: `<p>
-              <i>Use browser refresh to reset the graph.</i>
-              </p>`,
-            },
-            {
-              type: "table",
-              id: "tEdges",
-              label: "<b>Edges</b>",
-              dataref: "q1",
-              colspecs: [
-                { title: "Time Bkt", field: "time_bkt", defaultSort: "desc" },
-                { title: "Sub Type", field: "sub_type" },
-                { title: "Sub ID", field: "sub_id" },
-                { title: "Sub Name", field: "sub_name", },
-                { title: "Pred", field: "pred" },
-                { title: "Pred Status", field: "pred_status" },
-                { title: "Obj Type", field: "obj_type", },
-                { title: "Obj ID", field: "obj_id", },
-                { title: "Obj Name", field: "obj_name", },
-                { title: "Count", field: "cnt", },
-                { title: "Firstseen", field: "first_seen", },
-                { title: "Lastseen", field: "last_seen", },
-              ],
-              options: {
-                search: true,
-                paging: true,
-                filtering: false,
-                exportButton: true,
-                maxBodyHeight: "70vh",
-                padding: "dense",
-                headerStyle: { backgroundColor: "#ceebfd" },
-              },
-            },
-            {
               type: "graphvis",
               id: "gv01",
               dataref: "d1q1",
               label: "<b>Graph</b>",
-              style: { width: "800px", height: "500px" },
+              style: { width: "1000px", height: "500px" },
               options: {
                 layout: {
                   improvedLayout: true,
@@ -199,6 +166,40 @@ const app_spec = {
                 height: "500px"
               },
             },
+            {
+              type: "table",
+              id: "tEdges",
+              label: "<b>Edges</b>",
+              dataref: "q1",
+              colspecs: [
+                { title: "Sub Type", field: "sub_type" },
+                { title: "Sub ID", field: "sub_id" },
+                { title: "Sub Name", field: "sub_name", },
+                { title: "Pred", field: "pred" },
+                { title: "Pred Status", field: "pred_status" },
+                { title: "Obj Type", field: "obj_type", },
+                { title: "Obj ID", field: "obj_id", },
+                { title: "Obj Name", field: "obj_name", },
+                { title: "Count", field: "cnt", },
+                { title: "Firstseen", field: "first_seen", defaultSort: "desc"},
+                { title: "Lastseen", field: "last_seen", },
+              ],
+              options: {
+                search: true,
+                paging: true,
+                filtering: false,
+                exportButton: true,
+                maxBodyHeight: "70vh",
+                padding: "dense",
+                // blue
+                //headerStyle: { backgroundColor: "#ceebfd" },
+                // orange
+                //headerStyle: { backgroundColor: "#ffe9e6" },
+                // SlateGray
+                headerStyle: { backgroundColor: "#dfecec" },
+              },
+            },
+            
           ],
         },
         {
@@ -213,8 +214,9 @@ const app_spec = {
               justify: "flex-start",
               value: `
       <i>Contact Lipyeow for help</i>
-
-      <h2>Background</h2>
+      <h2>Tips</h2>
+      <p><i>Use browser refresh to reset the graph.</i></p>
+      
       `,
             },
           ],
