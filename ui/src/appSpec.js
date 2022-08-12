@@ -152,7 +152,7 @@ const app_spec = {
               id: "gv01",
               dataref: "d1q1",
               label: "<b>Graph</b>",
-              style: { width: "1000px", height: "500px" },
+              style: { width: "1000px", height: "400px" },
               // state for affected widgets must be manually handled in GraphVis.js
               affected_widgets: ["ti1",],
               actions: [{
@@ -204,7 +204,69 @@ const app_spec = {
                 headerStyle: { backgroundColor: "#dfecec" },
               },
             },
+            {
+              type: "text",
+              id: "detail_banner",
+              width: 12,
+              justify: "flex-start",
+              value: `
+      <h2>Get the raw details for selected node:</h2>
+      `,
+            },
+            {
+              type: "form",
+              id: "f2",
+              widgets: [
+                {
+                  type: "text_input",
+                  label: "Enter data source",
+                  id: "ti2"
+                },
+                {
+                  type: "text_input",
+                  label: "firstseen_ts",
+                  id: "ti3"
+                },
+                {
+                  type: "text_input",
+                  label: "lastseen_ts",
+                  id: "ti4"
+                },
+                {
+                  type: "button",
+                  label: "Get Raw Details",
+                  id: "b2",
+                  trigger: "q2"
+                },
 
+              ],
+            },
+            {
+              type: "table",
+              id: "tRawDetails",
+              label: "<b>Raw Logs</b>",
+              dataref: "q2",
+              colspecs: [
+                { title: "Ingest Timestamp", field: "ingest_ts" },
+                { title: "Event Timestamp", field: "event_ts" },
+                { title: "Event Date", field: "event_date", },
+                { title: "Raw JSON", field: "raw" },
+              ],
+              options: {
+                search: true,
+                paging: true,
+                filtering: false,
+                exportButton: true,
+                maxBodyHeight: "70vh",
+                padding: "dense",
+                // blue
+                //headerStyle: { backgroundColor: "#ceebfd" },
+                // orange
+                //headerStyle: { backgroundColor: "#ffe9e6" },
+                // SlateGray
+                headerStyle: { backgroundColor: "#dfecec" },
+              },
+            },
           ],
         },
         {
@@ -214,7 +276,7 @@ const app_spec = {
           widgets: [
             {
               type: "text",
-              id: "txt_educator",
+              id: "txt_help",
               width: 12,
               justify: "flex-start",
               value: `
@@ -333,7 +395,23 @@ LIMIT 100
       id: "d1q1",
       from: "q1",
       derivation: extract_graph_remap
-    }
+    },
+    {
+      type: "query",
+      id: "q2",
+      backend: "native",
+      endpoint: "demo-field-eng",
+      cumulative: false,
+      query: `
+SELECT
+  *
+FROM
+  lipyeow_ctx.aad_bronze 
+WHERE event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}'
+LIMIT 100
+`,
+      args: [{ from: "ti1", sub: "firstseen_ts" }, { from: "m1", sub: "lastseen_ts" }],
+    },
   ],
 };
 
