@@ -15,6 +15,7 @@ import LastPage from "@material-ui/icons/LastPage";
 import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
+import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { cloneDeep } from "lodash";
 import { appState } from "./state.js";
@@ -57,22 +58,30 @@ function DataTable(args) {
   const [queryState, setQueryState] = useRecoilState(
     appState[objState.dataref]
   );
+  let updateStates = {};
+  updateStates[args.affected_widgets[0]] = useRecoilState(appState[args.affected_widgets[0]]);
+  updateStates[args.affected_widgets[1]] = useRecoilState(appState[args.affected_widgets[1]]);
+  updateStates[args.affected_widgets[2]] = useRecoilState(appState[args.affected_widgets[2]]);
+  updateStates[args.affected_widgets[3]] = useRecoilState(appState[args.affected_widgets[3]]);
+  updateStates[args.affected_widgets[4]] = useRecoilState(appState[args.affected_widgets[4]]);
+  updateStates[args.affected_widgets[5]] = useRecoilState(appState[args.affected_widgets[5]]);
+  let actions = [];
+  if (args.affected_widgets[0] !== "null") {
+    const update_fields = args.actions[0].update_widgets;
+    actions[0] = {
+      icon: ZoomInIcon,
+      tooltip: "get raw logs",
+      onClick: (event, rowData) => {
+        for (let i = 0; i < 6; i++) {
+          const [widgetState, setWidgetState] = updateStates[update_fields[i].widget];
+          let copyState = cloneDeep(widgetState);
+          copyState.value = rowData[update_fields[i].src];
+          setWidgetState(copyState);
+        }
+      }
+    };
+  }
 
-  /*
-  const runUrlFetchQuery = (qid) => {
-    //console.log("Run Url Fetch Query: " + qid);
-    const url = queryState.query;
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        //console.log("runUrlFetchQuery : " + data);
-        let copyState = cloneDeep(queryState);
-        copyState.data = cloneDeep(data);
-        copyState.cols = extractColumnSpec(data);
-        setQueryState(copyState);
-      });
-  };
-*/
   // initialize the data that depends on initial fetch query
   // TODO: this init doesn't belong here. Need to do it the recoil way
   React.useEffect(() => {
@@ -93,7 +102,7 @@ function DataTable(args) {
   }, [queryState, setQueryState]);
 
   // material table actually writes to the columns array passed in!
-  // colspecs provide in table always overwrites derive specs from query
+  // colspecs provided in table spec always overwrites derive specs from query
   let columns = [];
   if (objState.colspecs.length > 0) {
     // convert link type to render
@@ -107,6 +116,12 @@ function DataTable(args) {
           <a href={prefix + rowData[spec.field]} download>
             {spec.link.text.length === 0 ? rowData[spec.field] : spec.link.text}
           </a>
+        );
+      } else if(spec.hasOwnProperty("json")){
+        spec.render = (rowData) => (
+          <pre>
+            {JSON.stringify(JSON.parse(rowData[spec.field]), null, 2)}
+          </pre>
         );
       }
       return spec;
@@ -133,6 +148,7 @@ function DataTable(args) {
       data={cloneDeep(queryState.data)}
       columns={columns}
       options={objState.options}
+      actions={actions}
     />
   );
 }

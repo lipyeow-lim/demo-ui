@@ -58,13 +58,17 @@ function extract_graph_remap(data) {
       id: node_mapping[sub_key],
       label: "", title: x.sub_type + ":" + x.sub_name,
       color: node_color(x.sub_type),
-      src_id: x.sub_id
+      src_id: x.sub_id,
+      //firstseen: x.firstseen,
+      //lastseen: x.lastseen
     };
     const n2 = {
       id: node_mapping[obj_key],
       label: "", title: x.obj_type + ":" + x.obj_name,
       color: node_color(x.obj_type),
-      src_id: x.obj_id
+      src_id: x.obj_id,
+      //firstseen: x.firstseen,
+      //lastseen: x.lastseen
     };
     const e = { from: node_mapping[sub_key], to: node_mapping[obj_key], title: x.pred + ":" + x.pred_status };
     g.nodes.add(JSON.stringify(n1));
@@ -176,7 +180,21 @@ const app_spec = {
               id: "tEdges",
               label: "<b>Edges</b>",
               dataref: "q1",
+              affected_widgets: ["ti2_src", "ti3_first", "ti4_last", "ti5_sub", "ti6_pred", "ti7_obj"],
+              actions: [
+                {
+                  event: "clickOnZoomIcon",
+                  update_widgets: [
+                    { src: "src", widget: "ti2_src" },
+                    { src: "first_seen", widget: "ti3_first" },
+                    { src: "last_seen", widget: "ti4_last" },
+                    { src: "sub_id", widget: "ti5_sub" },
+                    { src: "pred", widget: "ti6_pred" },
+                    { src: "obj_id", widget: "ti7_obj" }]
+                }
+              ],
               colspecs: [
+                { title: "Data Source", field: "src" },
                 { title: "Sub Type", field: "sub_type" },
                 { title: "Sub ID", field: "sub_id" },
                 { title: "Sub Name", field: "sub_name", },
@@ -219,18 +237,33 @@ const app_spec = {
               widgets: [
                 {
                   type: "text_input",
-                  label: "Enter data source",
-                  id: "ti2"
+                  label: "data source",
+                  id: "ti2_src"
                 },
                 {
                   type: "text_input",
                   label: "firstseen_ts",
-                  id: "ti3"
+                  id: "ti3_first"
                 },
                 {
                   type: "text_input",
                   label: "lastseen_ts",
-                  id: "ti4"
+                  id: "ti4_last"
+                },
+                {
+                  type: "text_input",
+                  label: "sub_id",
+                  id: "ti5_sub"
+                },
+                {
+                  type: "text_input",
+                  label: "pred",
+                  id: "ti6_pred"
+                },
+                {
+                  type: "text_input",
+                  label: "obj_id",
+                  id: "ti7_obj"
                 },
                 {
                   type: "button",
@@ -238,7 +271,6 @@ const app_spec = {
                   id: "b2",
                   trigger: "q2"
                 },
-
               ],
             },
             {
@@ -246,11 +278,12 @@ const app_spec = {
               id: "tRawDetails",
               label: "<b>Raw Logs</b>",
               dataref: "q2",
+              affected_widgets: ["null", "null", "null", "null", "null", "null"],
+              actions: [],
               colspecs: [
                 { title: "Ingest Timestamp", field: "ingest_ts" },
                 { title: "Event Timestamp", field: "event_ts" },
-                { title: "Event Date", field: "event_date", },
-                { title: "Raw JSON", field: "raw" },
+                { title: "Raw JSON", field: "raw", json: true },
               ],
               options: {
                 search: true,
@@ -309,7 +342,8 @@ WITH sub_matches AS (
 ), 
 sub_same_as AS (
   SELECT
-    NULL as time_bkt,
+    s1.src,
+    s1.time_bkt,
     s1.sub_type,
     s1.sub_id,
     s1.sub_name,
@@ -337,7 +371,8 @@ obj_matches AS (
 ),
 obj_same_as AS (
   SELECT
-    NULL as time_bkt,
+    s3.src,
+    s3.time_bkt,
     s3.sub_type,
     s3.sub_id,
     s3.sub_name,
@@ -403,14 +438,32 @@ LIMIT 100
       endpoint: "demo-field-eng",
       cumulative: false,
       query: `
-SELECT
-  *
-FROM
-  lipyeow_ctx.aad_bronze 
-WHERE event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}'
-LIMIT 100
+      SELECT b.ingest_ts, b.event_ts, b.raw
+      FROM lipyeow_ctx.aad_bronze AS b 
+      WHERE b.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
+      AND b.raw:id IN (
+        SELECT s.src_rid
+        FROM lipyeow_ctx.{{data_source}}_edges_silver AS s 
+          JOIN lipyeow_ctx.{{data_source}}_edges_gold AS g 
+          ON s.sub_id=g.sub_id 
+            AND s.obj_id = g.obj_id 
+            AND s.pred = g.pred
+            AND date_trunc('DAY', s.event_ts) = g.time_bkt
+        WHERE g.sub_id = '{{sub_id}}' 
+          AND g.obj_id='{{obj_id}}'
+          AND g.pred = '{{pred}}'
+          AND s.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
+      )
+      LIMIT 100
 `,
-      args: [{ from: "ti1", sub: "firstseen_ts" }, { from: "m1", sub: "lastseen_ts" }],
+      args: [
+        { from: "ti2_src", sub: "data_source" },
+        { from: "ti3_first", sub: "firstseen_ts" },
+        { from: "ti4_last", sub: "lastseen_ts" },
+        { from: "ti5_sub", sub: "sub_id" },
+        { from: "ti6_pred", sub: "pred" },
+        { from: "ti7_obj", sub: "obj_id" }
+      ],
     },
   ],
 };

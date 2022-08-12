@@ -92,39 +92,11 @@ function genAppState(widgets) {
     );
     appState[derived.id] = obj;
   };
-  // add graphvis-cumulative separately with Atom effects
-  /*
-  const gvc_list = widgets.filter((x) => x.type === "graphvis-cumulative");
-  for (const gvc of gvc_list) {
-    const src_state = appState[gvc.merge_from].get();
-    const sync_merge_effect = ({ setSelf, trigger }) => {
-      // Initialize atom value to the merge_from state
-      if (trigger === 'get') { // Avoid expensive initialization
-        //src_state.data;
-        // how to get the self data
-        //setSelf(); // Call synchronously to initialize
-      }
-
-      // Subscribe to remote storage changes and update the atom value
-      src_state.onChange(() => {
-        //setSelf(); // Call asynchronously to change value
-      });
-
-      // Cleanup remote storage subscription
-      return () => {
-        src_state.onChange(null);
-      };
-    };
-    let obj = atom({
-      key: gvc.id,
-      default: null,
-      effects: [
-        sync_merge_effect]
-    }
-    );
-    appState[gvc.id] = obj;
-  }
-  */
+  // Add a special null widget state
+  appState["null"] = atom({
+    key: "null",
+    default: { desc: "this is a null state used as work around for no-op" }
+  });
   //console.log("appState:");
   //console.log(appState);
   return appState;

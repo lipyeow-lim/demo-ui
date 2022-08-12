@@ -31,6 +31,8 @@ function Widget(args) {
             key={args.wspec.id}
             id={args.wspec.id}
             label={args.wspec.label}
+            affected_widgets={args.wspec.affected_widgets}
+            actions={args.wspec.actions}
           />
         </Grid>
       );

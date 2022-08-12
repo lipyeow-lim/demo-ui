@@ -26,6 +26,8 @@ def jsonify(row):
     for (k,v) in row.asDict().items():
         if type(v)==datetime.datetime:
             rec[k] = v.isoformat()
+        elif type(v)==datetime.date:
+            rec[k] = v.isoformat()
         else:
             rec[k] = v
     return rec
