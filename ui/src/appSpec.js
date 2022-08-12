@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 function node_color(node_type) {
   let color = "lightblue";
   switch (node_type) {
@@ -36,7 +34,7 @@ function node_color(node_type) {
   last_seen,
   cnt
 }
-*/ 
+*/
 function extract_graph_remap(data) {
   let graph = { nodes: [], edges: [] };
   if (data.length === 0) {
@@ -46,12 +44,12 @@ function extract_graph_remap(data) {
   let node_counter = 0;
   const empty_g = { nodes: new Set(), edges: new Set() };
   const tmp_g = data.reduce((g, x) => {
-    const sub_key = x.sub_type+":"+x.sub_id+":"+x.sub_name;
+    const sub_key = x.sub_type + ":" + x.sub_id + ":" + x.sub_name;
     if (!node_mapping.hasOwnProperty(sub_key)) {
       node_mapping[sub_key] = node_counter;
       node_counter = node_counter + 1;
     };
-    const obj_key = x.obj_type+":"+x.obj_id+":"+x.obj_name;
+    const obj_key = x.obj_type + ":" + x.obj_id + ":" + x.obj_name;
     if (!node_mapping.hasOwnProperty(obj_key)) {
       node_mapping[obj_key] = node_counter;
       node_counter = node_counter + 1;
@@ -63,8 +61,8 @@ function extract_graph_remap(data) {
       src_id: x.sub_id
     };
     const n2 = {
-      id: node_mapping[obj_key], 
-      label: "", title: x.obj_type + ":" + x.obj_name, 
+      id: node_mapping[obj_key],
+      label: "", title: x.obj_type + ":" + x.obj_name,
       color: node_color(x.obj_type),
       src_id: x.obj_id
     };
@@ -146,7 +144,7 @@ const app_spec = {
                   id: "b1",
                   trigger: "q1"
                 },
-                
+
               ],
             },
             {
@@ -155,6 +153,13 @@ const app_spec = {
               dataref: "d1q1",
               label: "<b>Graph</b>",
               style: { width: "1000px", height: "500px" },
+              // state for affected widgets must be manually handled in GraphVis.js
+              affected_widgets: ["ti1",],
+              actions: [{
+                event: "onSelect",
+                type: "setValue",
+                widgets: ["ti1",],
+              },],
               options: {
                 layout: {
                   improvedLayout: true,
@@ -181,7 +186,7 @@ const app_spec = {
                 { title: "Obj ID", field: "obj_id", },
                 { title: "Obj Name", field: "obj_name", },
                 { title: "Count", field: "cnt", },
-                { title: "Firstseen", field: "first_seen", defaultSort: "desc"},
+                { title: "Firstseen", field: "first_seen", defaultSort: "desc" },
                 { title: "Lastseen", field: "last_seen", },
               ],
               options: {
@@ -199,7 +204,7 @@ const app_spec = {
                 headerStyle: { backgroundColor: "#dfecec" },
               },
             },
-            
+
           ],
         },
         {

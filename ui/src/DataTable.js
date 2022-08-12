@@ -90,7 +90,7 @@ function DataTable(args) {
         });
     }
     // do the fetch
-  }, []);
+  }, [queryState, setQueryState]);
 
   // material table actually writes to the columns array passed in!
   // colspecs provide in table always overwrites derive specs from query

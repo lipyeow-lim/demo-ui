@@ -9,47 +9,42 @@ import { v4 as uuidv4 } from 'uuid';
 
 import 'vis-network/styles/vis-network.css';
 
-
-
 function GraphVis(args) {
   const [objState, setObjState] = useRecoilState(appState[args.id]);
   const queryState = useRecoilValue(appState[objState.dataref]);
-  const [textInputState, setTextInputState] = useRecoilState(appState["ti1"]);
-
+  // React does not allow calling useRecoilState within a loop,
+  // hence, the updateStates must be constructed manually
+  let updateStates = {};
+  updateStates[args.affected_widgets[0]] = useRecoilState(appState[args.affected_widgets[0]]);
+  let events = {};
+  for (const action of args.actions) {
+    switch (action.event) {
+      case "onSelect":
+        events["select"] = function ({ nodes, edges }) {
+          if (nodes.length === 1) {
+            const node_obj = queryState.graph.nodes.filter((x) => x.id === nodes[0])[0];
+            const src_id = node_obj.src_id;
+            console.log(node_obj);
+            action.widgets.map((widget_id) => {
+              // check if widget_id in updateStates
+              const [widgetState, setWidgetState] = updateStates[widget_id];
+              let copyState = cloneDeep(widgetState);
+              copyState.value = src_id;
+              setWidgetState(copyState);
+              return null;
+            });
+          }
+        };
+        break;
+      default:
+        console.log("unsupport action.event : " + action.event);
+    }
+  }
+  //console.log("events:");
+  //console.log(events);
   const version = useMemo(uuidv4, [queryState.graph]);
   // TODO: sanity check on queryState.cols
-  const graph = {
-    nodes: [
-      { id: "1", label: "Node 1", title: "node 1 tootip text" },
-      { id: 2, label: "Node 2", title: "node 2 tootip text" },
-      { id: 3, label: "Node 3", title: "node 3 tootip text" },
-      { id: 4, label: "Node 4", title: "node 4 tootip text" },
-      { id: 5, label: "Node 5", title: "node 5 tootip text" }
-    ],
-    edges: [
-      { from: 1, to: 2 },
-      { from: 1, to: 3 },
-      { from: 2, to: 4 },
-      { from: 2, to: 5 }
-    ]
-  };
   //console.log(queryState);
-  const events = {
-    select: function ({ nodes, edges }) {
-      console.log("Selected nodes:");
-      console.log(JSON.stringify(nodes));
-      console.log("Selected edges:");
-      console.log(JSON.stringify(edges));
-      if(nodes.length===1){
-        const node_obj = queryState.graph.nodes.filter((x)=>x.id===nodes[0])[0];
-        const src_id = node_obj.src_id;
-        console.log(node_obj);
-        let copyState = cloneDeep(textInputState);
-        copyState.value = src_id;
-        setTextInputState(copyState);
-      }
-    }
-  };
   return (
     <Graph
       key={version}

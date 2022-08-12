@@ -110,7 +110,9 @@ function Widget(args) {
               key={args.wspec.id}
               id={args.wspec.id}
               label={args.wspec.label}
+              actions={args.wspec.actions}
               options={args.wspec.options}
+              affected_widgets={args.wspec.affected_widgets}
             />
           </div>
         </Grid>
