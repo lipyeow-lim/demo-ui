@@ -5,8 +5,17 @@ function node_color(node_type) {
     case "user-okta":
       color = "dimgray";
       break;
+    case "suricata-alert":
+      color = "red";
+      break;
+    case "hash":
+      color = "#F9E79F";
+      break;
+    case "fqdn":
+      color = "#F1C40F";
+      break;
     case "ipAddress":
-      color = "orange";
+      color = "#F39C12";
       break;
     case "app":
       color = "dodgerblue";
@@ -140,6 +149,7 @@ const app_spec = {
                   values: [
                     { id: 1, value: "2022-07-20T00:00:00.000+0000", display: "2022-07-20" },
                     { id: 2, value: "2022-07-21T00:00:00.000+0000", display: "2022-07-21" },
+                    { id: 3, value: "2022-08-09T00:00:00.000+0000", display: "2022-08-09" },
                   ]
                 },
                 {
@@ -228,7 +238,7 @@ const app_spec = {
               width: 12,
               justify: "flex-start",
               value: `
-      <h2>Get the raw details for selected node:</h2>
+      <h2>Get the raw details for selected edge:</h2>
       `,
             },
             {
@@ -296,8 +306,10 @@ const app_spec = {
                 //headerStyle: { backgroundColor: "#ceebfd" },
                 // orange
                 //headerStyle: { backgroundColor: "#ffe9e6" },
+                // beige
+                headerStyle: { backgroundColor: "#fcf3cf" },
                 // SlateGray
-                headerStyle: { backgroundColor: "#dfecec" },
+                //headerStyle: { backgroundColor: "#dfecec" },
               },
             },
           ],
@@ -330,6 +342,18 @@ const app_spec = {
       endpoint: "demo-field-eng",
       cumulative: true,
       query: `
+select *
+from lipyeow_ctx.v_edges
+where time_bkt = '{{day_ts}}' 
+    AND ( sub_id = '{{node_filter}}' 
+      OR sub_name = '{{node_filter}}'
+      OR obj_id = '{{node_filter}}'
+      OR obj_name = '{{node_filter}}'
+      OR sub_name ilike '%{{node_filter}}%'
+      OR obj_name ilike '%{{node_filter}}%'
+      )
+      `,
+      query_orig: `
 WITH sub_matches AS (
   select
     *
@@ -439,12 +463,12 @@ LIMIT 100
       cumulative: false,
       query: `
       SELECT b.ingest_ts, b.event_ts, b.raw
-      FROM lipyeow_ctx.aad_bronze AS b 
+      FROM lipyeow_ctx.{{data_source}}_bronze AS b 
       WHERE b.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
-      AND b.raw:id IN (
+      AND b.rid IN (
         SELECT s.src_rid
         FROM lipyeow_ctx.{{data_source}}_edges_silver AS s 
-          JOIN lipyeow_ctx.{{data_source}}_edges_gold AS g 
+          JOIN lipyeow_ctx.{{data_source}}_edges_gold_day AS g 
           ON s.sub_id=g.sub_id 
             AND s.obj_id = g.obj_id 
             AND s.pred = g.pred

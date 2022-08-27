@@ -104,7 +104,8 @@ async def resolve_getData(_, info, endpoint, query, args):
     results = execute_query(conn, sqlstr)
     #results = await concurrent_query_all(conn_list, query)
     close_connections(conn_list)
-    print(f"{endpoint}, {query}, {args}")
+    print(f"PARAMS:\nendpoint = {endpoint},\nargs = {args},\nquery=\n{query}")
+    print(f"SQL str:\n{sqlstr}")
     col_defs = []
     if len(results) > 0:
         col_defs = extract_column_defs(results[0])

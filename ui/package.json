@@ -21,6 +21,7 @@
     "react-graph-vis": "^1.0.7",
     "react-scripts": "^4.0.3",
     "recoil": "^0.4.1",
+    "vis-network": "^9.1.2",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
