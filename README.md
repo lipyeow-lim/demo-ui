@@ -16,7 +16,7 @@ Demo-UI consists of two components:
 ## Supported Widgets
 
 1. Tab Container (material-ui) 
-1. Data Table (material-table)
+1. Data Table ([material-table](https://material-table.com/#/))
 1. Query Form (material-ui)
 1. Text Input (material-ui)
 1. Dropdown Menu (material-ui)
