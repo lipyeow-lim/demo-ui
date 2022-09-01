@@ -1,6 +1,13 @@
 # Demo UI App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This app was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Quickstart
+
+1. In a terminal/shell on your laptop, go to this folder in your clone of this repo.
+1. Install required dependencies via `npm install`
+1. Run the app in development mode using `npm start`
+1. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## How to add a new widget/component
 
