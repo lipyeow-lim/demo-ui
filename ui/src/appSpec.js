@@ -341,7 +341,7 @@ const app_spec = {
       backend: "native",
       endpoint: "demo-field-eng",
       cumulative: true,
-      query: `
+      query_orig: `
 select *
 from lipyeow_ctx.v_edges
 where time_bkt = '{{day_ts}}' 
@@ -353,12 +353,12 @@ where time_bkt = '{{day_ts}}'
       OR obj_name ilike '%{{node_filter}}%'
       )
       `,
-      query_orig: `
+      query: `
 WITH sub_matches AS (
   select
     *
   from
-    lipyeow_ctx.v_edges
+    solacc_cga.v_edges_day
   where
     time_bkt = '{{day_ts}}'
     and ( sub_id = '{{node_filter}}'
@@ -381,13 +381,13 @@ sub_same_as AS (
     NULL as cnt
   FROM
     sub_matches AS e1
-    JOIN lipyeow_ctx.same_as AS s1 ON e1.sub_id = s1.sub_id 
+    JOIN solacc_cga.same_as AS s1 ON e1.sub_id = s1.sub_id 
 ),
 obj_matches AS (
   select
     *
   from
-    lipyeow_ctx.v_edges
+    solacc_cga.v_edges_day
   where
     time_bkt = '{{day_ts}}'
     and (obj_id = '{{node_filter}}'
@@ -410,7 +410,7 @@ obj_same_as AS (
     NULL as cnt
   FROM
     obj_matches AS e3
-    JOIN lipyeow_ctx.same_as AS s3 ON e3.obj_id = s3.sub_id
+    JOIN solacc_cga.same_as AS s3 ON e3.obj_id = s3.sub_id
 )
 SELECT
   *
@@ -421,7 +421,7 @@ SELECT
   e2.*
 FROM
   sub_same_as AS s2
-  JOIN lipyeow_ctx.v_edges AS e2 ON s2.obj_id = e2.sub_id
+  JOIN solacc_cga.v_edges_day AS e2 ON s2.obj_id = e2.sub_id
             and e2.time_bkt = '{{day_ts}}'
 UNION
 SELECT
@@ -433,7 +433,7 @@ SELECT
   e4.*
 FROM
   obj_same_as AS s4
-  JOIN lipyeow_ctx.v_edges AS e4 ON s4.obj_id = e4.obj_id
+  JOIN solacc_cga.v_edges_day AS e4 ON s4.obj_id = e4.obj_id
             and e4.time_bkt = '{{day_ts}}'
 UNION
 SELECT
@@ -461,7 +461,7 @@ LIMIT 100
       backend: "native",
       endpoint: "demo-field-eng",
       cumulative: false,
-      query: `
+      query_orig: `
       SELECT b.ingest_ts, b.event_ts, b.raw
       FROM lipyeow_ctx.{{data_source}}_bronze AS b 
       WHERE b.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
@@ -469,6 +469,25 @@ LIMIT 100
         SELECT s.src_rid
         FROM lipyeow_ctx.{{data_source}}_edges_silver AS s 
           JOIN lipyeow_ctx.{{data_source}}_edges_gold_day AS g 
+          ON s.sub_id=g.sub_id 
+            AND s.obj_id = g.obj_id 
+            AND s.pred = g.pred
+            AND date_trunc('DAY', s.event_ts) = g.time_bkt
+        WHERE g.sub_id = '{{sub_id}}' 
+          AND g.obj_id='{{obj_id}}'
+          AND g.pred = '{{pred}}'
+          AND s.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
+      )
+      LIMIT 100
+`,
+      query: `
+      SELECT b.ingest_ts, b.event_ts, b.raw
+      FROM solacc_cga.{{data_source}}_bronze AS b 
+      WHERE b.event_ts BETWEEN '{{firstseen_ts}}' AND '{{lastseen_ts}}' 
+      AND b.rid IN (
+        SELECT s.src_rid
+        FROM solacc_cga.{{data_source}}_edges_silver AS s 
+          JOIN solacc_cga.{{data_source}}_edges_gold_day AS g 
           ON s.sub_id=g.sub_id 
             AND s.obj_id = g.obj_id 
             AND s.pred = g.pred
